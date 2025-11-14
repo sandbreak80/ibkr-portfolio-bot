@@ -2,7 +2,6 @@
 import os
 from unittest.mock import Mock, patch
 
-import pytest
 import requests
 
 from src.core.alerting import (
@@ -51,13 +50,13 @@ def test_send_message_success(mock_post: Mock) -> None:
     mock_response = Mock()
     mock_response.raise_for_status = Mock()
     mock_post.return_value = mock_response
-    
+
     alerter = DiscordAlerter(webhook_url="https://discord.com/api/webhooks/test")
     result = alerter.send_message("Test", "Body", color=0x123456)
-    
+
     assert result is True
     mock_post.assert_called_once()
-    
+
     # Verify payload structure
     call_args = mock_post.call_args
     payload = call_args[1]["json"]
@@ -73,15 +72,15 @@ def test_send_message_with_fields(mock_post: Mock) -> None:
     mock_response = Mock()
     mock_response.raise_for_status = Mock()
     mock_post.return_value = mock_response
-    
+
     alerter = DiscordAlerter(webhook_url="https://test.com")
     fields = [
         {"name": "Field1", "value": "Value1", "inline": True},
         {"name": "Field2", "value": "Value2", "inline": False},
     ]
-    
+
     result = alerter.send_message("Test", "Body", fields=fields)
-    
+
     assert result is True
     payload = mock_post.call_args[1]["json"]
     assert payload["embeds"][0]["fields"] == fields
@@ -91,10 +90,10 @@ def test_send_message_with_fields(mock_post: Mock) -> None:
 def test_send_message_http_error(mock_post: Mock) -> None:
     """Test message send with HTTP error."""
     mock_post.side_effect = requests.exceptions.HTTPError("Server error")
-    
+
     alerter = DiscordAlerter(webhook_url="https://test.com")
     result = alerter.send_message("Test", "Body")
-    
+
     assert result is False
 
 
@@ -102,14 +101,14 @@ def test_send_message_http_error(mock_post: Mock) -> None:
 def test_send_rebalance_success_alert(mock_send: Mock) -> None:
     """Test rebalance success alert."""
     mock_send.return_value = True
-    
+
     send_rebalance_success_alert(
         orders_placed=2,
         portfolio_value=10000.0,
         positions={"SPY": 0.5, "QQQ": 0.45},
         execution_time_seconds=5.3
     )
-    
+
     mock_send.assert_called_once()
     call_args = mock_send.call_args
     assert "✅" in call_args[1]["title"]
@@ -120,10 +119,10 @@ def test_send_rebalance_success_alert(mock_send: Mock) -> None:
 def test_send_rebalance_error_alert(mock_send: Mock) -> None:
     """Test rebalance error alert."""
     mock_send.return_value = True
-    
+
     error = ConnectionError("Test error")
     send_rebalance_error_alert(error, context={"account": "DUK200445"})
-    
+
     mock_send.assert_called_once()
     call_args = mock_send.call_args
     assert "🚨" in call_args[1]["title"]
@@ -134,9 +133,9 @@ def test_send_rebalance_error_alert(mock_send: Mock) -> None:
 def test_send_data_quality_warning(mock_send: Mock) -> None:
     """Test data quality warning alert."""
     mock_send.return_value = True
-    
+
     send_data_quality_warning("SPY", "Price jump detected")
-    
+
     mock_send.assert_called_once()
     call_args = mock_send.call_args
     assert "⚠️" in call_args[1]["title"]
@@ -147,9 +146,9 @@ def test_send_data_quality_warning(mock_send: Mock) -> None:
 def test_send_startup_notification(mock_send: Mock) -> None:
     """Test startup notification."""
     mock_send.return_value = True
-    
+
     send_startup_notification()
-    
+
     mock_send.assert_called_once()
     call_args = mock_send.call_args
     assert "🚀" in call_args[1]["title"]
@@ -160,9 +159,9 @@ def test_send_startup_notification(mock_send: Mock) -> None:
 def test_send_test_alert(mock_send: Mock) -> None:
     """Test test alert."""
     mock_send.return_value = True
-    
+
     result = send_test_alert()
-    
+
     assert result is True
     mock_send.assert_called_once()
     call_args = mock_send.call_args

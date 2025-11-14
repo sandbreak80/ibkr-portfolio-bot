@@ -15,9 +15,9 @@ async def test_place_orders_limit_order_no_price() -> None:
     mock_client = MagicMock()
     mock_client.connected = True
     mock_client.ib = MagicMock()
-    
+
     executor = IBKRExecutor(mock_client, config)
-    
+
     orders = [
         {
             "symbol": "SPY",
@@ -28,7 +28,7 @@ async def test_place_orders_limit_order_no_price() -> None:
             "account": "DUK200445",
         }
     ]
-    
+
     results = await executor.place_orders(orders, dry_run=False)
     # Should handle missing limit price gracefully
     assert len(results) >= 0
@@ -42,9 +42,9 @@ async def test_place_orders_error_handling() -> None:
     mock_client.connected = True
     mock_client.ib = MagicMock()
     mock_client.ib.placeOrder = AsyncMock(side_effect=Exception("Connection error"))
-    
+
     executor = IBKRExecutor(mock_client, config)
-    
+
     orders = [
         {
             "symbol": "SPY",
@@ -54,7 +54,7 @@ async def test_place_orders_error_handling() -> None:
             "account": "DUK200445",
         }
     ]
-    
+
     results = await executor.place_orders(orders, dry_run=False)
     # Should handle errors gracefully
     assert len(results) == 1
@@ -67,11 +67,11 @@ async def test_execute_rebalance_with_equity() -> None:
     config = load_config()
     mock_client = MagicMock()
     mock_client.connected = True
-    
+
     executor = IBKRExecutor(mock_client, config)
-    
+
     weights = {"SPY": 0.5}
-    
+
     results = await executor.execute_rebalance(weights, equity=30000.0, dry_run=True, paper=True)
     assert isinstance(results, list)
 
@@ -82,11 +82,11 @@ async def test_execute_rebalance_live_mode() -> None:
     config = load_config()
     mock_client = MagicMock()
     mock_client.connected = True
-    
+
     executor = IBKRExecutor(mock_client, config)
-    
+
     weights = {"SPY": 0.5}
-    
+
     # In dry_run, should not actually place orders
     results = await executor.execute_rebalance(weights, dry_run=True, live=True)
     assert isinstance(results, list)

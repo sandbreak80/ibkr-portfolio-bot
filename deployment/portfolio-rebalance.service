@@ -1,0 +1,17 @@
+[Unit]
+Description=IBKR Portfolio Rebalancer
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/home/brad/cursor_code/metagross_projects/stock_portfolio
+ExecStart=/usr/bin/docker compose run --rm app poetry run bot trade --paper
+StandardOutput=append:/var/log/portfolio-rebalance.log
+StandardError=append:/var/log/portfolio-rebalance-error.log
+User=brad
+Group=brad
+
+[Install]
+WantedBy=multi-user.target
+

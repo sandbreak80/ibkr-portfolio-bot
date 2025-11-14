@@ -1,16 +1,23 @@
 """CLI entry point."""
 import asyncio
 import json
+import time
 from datetime import datetime
 from typing import Optional
 
 import click
 import pandas as pd
 
+from src.core.alerting import (
+    send_data_quality_warning,
+    send_rebalance_error_alert,
+    send_rebalance_success_alert,
+)
 from src.core.config import load_config
 from src.core.logging import setup_logging
 from src.data.cache import ParquetCache
 from src.data.ingestion import DataIngestion
+from src.data.validation import check_data_quality_batch
 from src.strategy.backtest import run_backtest
 from src.strategy.permutation import run_permutation_tests_on_windows
 from src.strategy.reporting import generate_backtest_report
@@ -365,14 +372,41 @@ def trade(dry_run: bool, paper: bool, live: bool) -> None:
     weights_dict = calculate_weights(selected, returns, config)
 
     async def run_trade() -> None:
+        start_time = time.time()
+        client = None
+
         try:
+            # Validate data quality
+            click.echo("Validating data quality...")
+            failures = check_data_quality_batch(data, max_staleness_days=2)
+
+            if failures:
+                click.echo(f"⚠️  Data quality issues detected for {len(failures)} symbols:")
+                for symbol, error in failures.items():
+                    click.echo(f"  - {symbol}: {error}")
+                    send_data_quality_warning(symbol, error)
+
+                # Remove failed symbols from consideration
+                for symbol in failures:
+                    if symbol in data:
+                        del data[symbol]
+
+                if not data:
+                    raise ValueError("All symbols failed data quality checks")
+
             # Connect to IBKR
+            click.echo("Connecting to IBKR...")
             client = IBKRClient(config.ibkr)
             await client.connect()
 
             executor = IBKRExecutor(client, config)
 
+            # Get account value for metrics
+            account_summary = client.get_account_summary()
+            account_value = float(account_summary.get("NetLiquidation", 0))
+
             click.echo(f"Executing rebalance (dry-run={dry_run}, paper={paper}, live={live})")
+            click.echo(f"Account value: ${account_value:,.2f}")
             click.echo(f"Target weights: {weights_dict}")
 
             results = await executor.execute_rebalance(
@@ -382,15 +416,50 @@ def trade(dry_run: bool, paper: bool, live: bool) -> None:
                 live=live,
             )
 
+            # Display results
+            orders_placed = 0
             for result in results:
                 status = result.get("status", "unknown")
                 order = result.get("order", {})
                 click.echo(f"{status}: {order.get('action')} {order.get('quantity')} {order.get('symbol')}")
 
+                if status in ["submitted", "filled"]:
+                    orders_placed += 1
+
             await client.disconnect()
 
+            # Calculate execution time
+            execution_time = time.time() - start_time
+
+            # Send success alert (skip for dry-run)
+            if not dry_run:
+                send_rebalance_success_alert(
+                    orders_placed=orders_placed,
+                    portfolio_value=account_value,
+                    positions=weights_dict,
+                    execution_time_seconds=execution_time
+                )
+
+            click.echo(f"\n✅ Rebalance completed in {execution_time:.1f}s")
+
         except Exception as e:
-            click.echo(f"Trade execution failed: {e}", err=True)
+            click.echo(f"❌ Trade execution failed: {e}", err=True)
+
+            # Send error alert
+            context = {
+                "mode": "live" if live else "paper",
+                "dry_run": dry_run,
+                "universe_size": len(config.universe),
+            }
+            send_rebalance_error_alert(e, context=context)
+
+            # Cleanup
+            if client:
+                try:
+                    await client.disconnect()
+                except Exception:
+                    pass
+
             raise
 
     asyncio.run(run_trade())

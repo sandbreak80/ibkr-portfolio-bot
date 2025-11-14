@@ -1,0 +1,15 @@
+[Unit]
+Description=Daily portfolio rebalance at 15:55 ET
+Requires=portfolio-rebalance.service
+
+[Timer]
+# Run Monday-Friday at 15:55 ET
+# EDT (Mar-Nov): 15:55 ET = 19:55 UTC
+# EST (Nov-Mar): 15:55 ET = 20:55 UTC
+# Using 19:55 UTC (will be correct during EDT, 1hr early during EST - adjust as needed)
+OnCalendar=Mon-Fri 19:55:00 UTC
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+

@@ -2,7 +2,6 @@
 from datetime import datetime
 
 import pandas as pd
-import pytest
 
 from src.core.config import load_config
 from src.strategy.backtest import calculate_returns, run_backtest
@@ -44,7 +43,7 @@ def test_run_backtest_no_dates() -> None:
         )
     }
     config = load_config()
-    
+
     results = run_backtest(data, config)
     assert results == {}
 
@@ -66,10 +65,10 @@ def test_run_backtest_date_range_filtering() -> None:
     }
     config = load_config()
     config.selection.top_n = 1
-    
+
     start_date = datetime(2020, 1, 10)
     end_date = datetime(2020, 1, 50)
-    
+
     results = run_backtest(data, config, start_date=start_date, end_date=end_date)
     if results:
         assert "equity" in results
@@ -92,7 +91,7 @@ def test_run_backtest_no_returns_calculated() -> None:
         )
     }
     config = load_config()
-    
+
     results = run_backtest(data, config)
     # Should handle gracefully
     assert isinstance(results, dict)

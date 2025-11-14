@@ -8,6 +8,7 @@ from ib_insync import IB, Contract, Stock, util
 
 from src.core.config import IBKRConfig
 from src.core.logging import get_logger
+from src.core.retry import async_retry_with_backoff
 
 logger = get_logger(__name__)
 
@@ -28,12 +29,17 @@ class IBKRClient:
         self._last_request_time = 0.0
         self._min_request_interval = 0.2  # 200ms minimum between requests
 
+    @async_retry_with_backoff(
+        max_attempts=3,
+        initial_delay=2.0,
+        exceptions=(ConnectionError, OSError, TimeoutError)
+    )
     async def connect(self) -> None:
         """
-        Connect to TWS/Gateway.
+        Connect to TWS/Gateway with automatic retry.
 
         Raises:
-            ConnectionError: If connection fails
+            ConnectionError: If connection fails after retries
         """
         try:
             await self.ib.connectAsync(
