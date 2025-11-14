@@ -97,8 +97,8 @@ def plot_monthly_returns_heatmap(returns: pd.Series, output_path: Path) -> None:
         logger.warning("Empty returns series, skipping plot")
         return
 
-    # Convert to monthly returns
-    monthly_returns = returns.resample("M").apply(lambda x: (1 + x).prod() - 1)
+    # Convert to monthly returns (ME = month end)
+    monthly_returns = returns.resample("ME").apply(lambda x: (1 + x).prod() - 1)
 
     # Create pivot table (year x month)
     monthly_returns.index = pd.to_datetime(monthly_returns.index)

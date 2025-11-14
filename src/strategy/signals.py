@@ -124,8 +124,8 @@ def calculate_signals(
                 continue
 
             close = symbol_df["close"]
-            high = symbol_df["high"]
-            low = symbol_df["low"]
+            # high = symbol_df["high"]  # Reserved for future use (stop losses, etc.)
+            # low = symbol_df["low"]    # Reserved for future use (stop losses, etc.)
 
             # Calculate EMAs
             ema_fast = ema(close, config.features.ema_fast)

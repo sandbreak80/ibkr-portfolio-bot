@@ -77,11 +77,8 @@ class IBKRExecutor:
                 # Calculate target notional
                 target_notional = equity * target_weight
 
-                # Get current position notional
+                # Get current position quantity
                 current_qty = current_positions.get(symbol, 0.0)
-                # For simplicity, assume we need current price (would fetch from IBKR in real implementation)
-                # Here we'll use a placeholder approach
-                current_notional = current_qty * 100.0  # Placeholder: assume $100/share
 
                 # Calculate target quantity (fractional)
                 # In real implementation, would fetch current price from IBKR

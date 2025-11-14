@@ -69,10 +69,10 @@ def atr(high: pd.Series, low: pd.Series, close: pd.Series, window: int) -> pd.Se
 
     for i in range(len(high)):
         h = high.iloc[i]
-        l = low.iloc[i]
+        lo = low.iloc[i]
         c = close.iloc[i]
 
-        tr = max(h - l, abs(h - prev_close), abs(l - prev_close))
+        tr = max(h - lo, abs(h - prev_close), abs(lo - prev_close))
         tr_values.append(tr)
         prev_close = c
 
