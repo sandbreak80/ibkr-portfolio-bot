@@ -1,0 +1,65 @@
+ibkr:
+  host: "127.0.0.1"
+  port: 7497
+  client_id: 17
+  account_paper: "DUK200445"
+  account_live: ""
+  market_mode: "delayed"
+  timeframe: "1 day"
+  start: "2015-01-01"
+  end: null
+
+universe: [SPY, QQQ, VTI, TLT, IEF, GLD, XLE, BND, BITO]
+
+rebalance:
+  schedule_et: "15:55"
+  frequency: "daily"
+
+costs:
+  commission_per_share: 0.0035
+  slippage_bps: 1.0
+
+features:
+  atr_window: 20
+  ema_fast: 20
+  ema_slow: 50
+  macd:
+    enabled: false
+    fast: 12
+    slow: 26
+    signal: 9
+
+selection:
+  top_n: 2
+  corr_window: 90
+  corr_cap: 0.7
+  min_score: 0.0
+
+weights:
+  method: "inv_vol"
+  vol_window: 20
+  max_weight_per_asset: 0.5
+  cash_buffer: 0.05
+
+backtest:
+  seed: 42
+  metrics: [CAGR, Sharpe, Calmar, MaxDD, PF, Turnover]
+
+walkforward:
+  train_years: 3
+  oos_months: 3
+  reoptimize:
+    ema_fast: [10, 20, 30]
+    ema_slow: [40, 50, 80]
+    top_n: [1, 2, 3]
+    corr_cap: [0.6, 0.7, 0.8]
+
+permutation:
+  runs: 200
+  objective: "Calmar"
+
+execution:
+  live: false
+  order_type: "MKT"
+  limit_offset_bps: 2
+  max_orders_per_day: 5
