@@ -1,0 +1,14 @@
+# Local configuration overrides
+# Copy this file to config.local.yaml and edit as needed
+# This file is gitignored
+
+# Example overrides:
+# ibkr:
+#   host: "127.0.0.1"
+#   port: 7497
+#   client_id: 18
+#
+# universe: [SPY, QQQ, VTI]
+#
+# selection:
+#   top_n: 3

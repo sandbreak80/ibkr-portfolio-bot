@@ -1,0 +1,24 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+      - data:/app/data
+      - reports:/app/reports
+      - artifacts:/app/artifacts
+    environment:
+      - IB_HOST=${IB_HOST:-127.0.0.1}
+      - IB_PORT=${IB_PORT:-7497}
+      - IB_CLIENT_ID=${IB_CLIENT_ID:-17}
+      - IB_ACCOUNT_PAPER=${IB_ACCOUNT_PAPER:-DUK200445}
+      - IB_ACCOUNT_LIVE=${IB_ACCOUNT_LIVE:-}
+    network_mode: host  # Required to connect to TWS/Gateway on host
+    stdin_open: true
+    tty: true
+
+volumes:
+  data:
+  reports:
+  artifacts:

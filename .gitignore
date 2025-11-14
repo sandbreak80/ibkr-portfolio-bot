@@ -1,0 +1,49 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+poetry.lock
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment
+.env
+config/config.local.yaml
+
+# Data
+data/parquet/
+*.parquet
+
+# Reports and artifacts
+reports/
+artifacts/
+*.png
+*.html
+*.json
+*.csv
+!pyproject.toml
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+*.cover
+.hypothesis/
+
+# Docker
+.dockerignore
+
+# OS
+.DS_Store
+Thumbs.db
