@@ -67,7 +67,7 @@ def test_run_backtest_date_range_filtering() -> None:
     config.selection.top_n = 1
 
     start_date = datetime(2020, 1, 10)
-    end_date = datetime(2020, 1, 50)
+    end_date = datetime(2020, 2, 15)  # Fixed: January only has 31 days
 
     results = run_backtest(data, config, start_date=start_date, end_date=end_date)
     if results:

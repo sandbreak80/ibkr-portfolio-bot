@@ -80,6 +80,7 @@ async def test_execute_rebalance_with_equity() -> None:
 async def test_execute_rebalance_live_mode() -> None:
     """Test execute_rebalance in live mode (should not actually execute)."""
     config = load_config()
+    config.ibkr.account_live = "LIVE123"  # Configure live account
     mock_client = MagicMock()
     mock_client.connected = True
 
