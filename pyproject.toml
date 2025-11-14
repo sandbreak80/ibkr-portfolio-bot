@@ -2,7 +2,7 @@
 name = "ibkr-portfolio-bot"
 version = "0.1.0"
 description = "Production-grade IBKR fractional swing trading system"
-authors = ["Your Name <you@example.com>"]
+authors = ["Brad Stoner <bstoner@gmail.com>"]
 packages = [{include = "src"}]
 
 [tool.poetry.dependencies]
