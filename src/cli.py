@@ -465,5 +465,142 @@ def trade(dry_run: bool, paper: bool, live: bool) -> None:
     asyncio.run(run_trade())
 
 
+@main.command()
+@click.option("--paper", is_flag=True, help="Use paper account (RECOMMENDED)")
+@click.option("--live", is_flag=True, help="Use LIVE account (⚠️ DANGER!)")
+@click.option("--buy-threshold", default=10.0, help="Minimum YOLO score to buy")
+@click.option("--sell-threshold", default=0.5, help="Exit if score drops to this ratio")
+@click.option("--scan-interval", default=300, help="Seconds between scans")
+def yolo(
+    paper: bool,
+    live: bool,
+    buy_threshold: float,
+    sell_threshold: float,
+    scan_interval: int
+) -> None:
+    """
+    🔥 Start real-time YOLO sentiment trading 🔥
+    
+    WARNING: THIS WILL LOSE YOUR MONEY!
+    
+    This command starts a live trading bot that:
+    - Scans Reddit (r/wallstreetbets) every 5 minutes
+    - Buys 100% into highest YOLO score ticker
+    - Sells if sentiment drops 50%
+    - Has NO risk management
+    
+    Requires:
+    - Reddit API credentials in .env
+    - IBKR TWS/Gateway running
+    - Discord webhook for alerts
+    
+    USE AT YOUR OWN RISK!
+    """
+    import os
+    
+    if live:
+        click.echo("\n" + "="*70)
+        click.echo("⚠️  ⚠️  ⚠️  LIVE TRADING MODE  ⚠️  ⚠️  ⚠️")
+        click.echo("="*70)
+        click.echo("\nThis will trade with REAL MONEY!")
+        click.echo("You WILL lose money.")
+        click.echo("There is NO stop loss.")
+        click.echo("There is NO risk management.")
+        click.echo("\nAre you ABSOLUTELY SURE you want to continue?")
+        
+        if not click.confirm("Type 'yes' to proceed with LIVE trading", default=False):
+            click.echo("\nAborting. (Good choice!)")
+            return
+    
+    # Load config
+    config = load_config()
+    
+    # Load sentiment API keys from environment
+    reddit_client_id = os.getenv("REDDIT_CLIENT_ID")
+    reddit_client_secret = os.getenv("REDDIT_CLIENT_SECRET")
+    reddit_user_agent = os.getenv("REDDIT_USER_AGENT", "YOLOBot/1.0")
+    
+    if not all([reddit_client_id, reddit_client_secret]):
+        click.echo("\n❌ Missing Reddit API credentials!")
+        click.echo("\nTo use YOLO mode, you need Reddit API access:")
+        click.echo("1. Go to https://www.reddit.com/prefs/apps")
+        click.echo("2. Create a new app (script type)")
+        click.echo("3. Add these to your .env:")
+        click.echo("   REDDIT_CLIENT_ID=your_client_id")
+        click.echo("   REDDIT_CLIENT_SECRET=your_client_secret")
+        return
+    
+    # Check Discord webhook
+    discord_webhook = os.getenv("DISCORD_WEBHOOK_URL")
+    if not discord_webhook:
+        click.echo("\n⚠️  Warning: No Discord webhook configured!")
+        click.echo("Set DISCORD_WEBHOOK_URL in .env to receive alerts.")
+        if not click.confirm("Continue without Discord alerts?"):
+            return
+    
+    click.echo("\n" + "="*70)
+    click.echo("🔥🔥🔥 YOLO TRADER INITIALIZATION 🔥🔥🔥")
+    click.echo("="*70)
+    click.echo(f"\nMode:           {'LIVE 💀' if live else 'PAPER 📄'}")
+    click.echo(f"Buy Threshold:  {buy_threshold}")
+    click.echo(f"Sell Threshold: {sell_threshold}x entry score")
+    click.echo(f"Scan Interval:  {scan_interval}s ({scan_interval//60}min)")
+    click.echo(f"Universe:       {len(config.universe)} tickers")
+    click.echo("\n" + "="*70)
+    click.echo("\nStarting in 5 seconds... (Ctrl+C to abort)")
+    click.echo("="*70 + "\n")
+    
+    try:
+        time.sleep(5)
+    except KeyboardInterrupt:
+        click.echo("\n\nAborted by user.")
+        return
+    
+    # Initialize sentiment aggregator
+    from src.sentiment.aggregator import SentimentAggregator
+    from src.strategy.yolo_trader import YOLOTrader
+    from src.brokers.ibkr_client import IBKRClient
+    from src.brokers.ibkr_exec import IBKRExecutor
+    
+    sentiment = SentimentAggregator(
+        reddit_client_id,
+        reddit_client_secret,
+        reddit_user_agent
+    )
+    
+    async def run_yolo():
+        # Connect to IBKR
+        client = IBKRClient(config.ibkr)
+        await client.connect()
+        
+        click.echo("✅ Connected to IBKR")
+        
+        # Create executor
+        executor = IBKRExecutor(client, config)
+        
+        # Create YOLO trader
+        trader = YOLOTrader(
+            config,
+            sentiment,
+            client,
+            executor,
+            buy_threshold=buy_threshold,
+            sell_threshold=sell_threshold,
+            scan_interval=scan_interval
+        )
+        
+        click.echo("✅ YOLO Trader initialized")
+        click.echo("\n🚀 Starting YOLO trading loop... (Ctrl+C to stop)\n")
+        
+        # Start trading
+        await trader.start()
+    
+    try:
+        asyncio.run(run_yolo())
+    except KeyboardInterrupt:
+        click.echo("\n\n🛑 YOLO Trader stopped by user.")
+        click.echo("Positions may still be open - check your account!")
+
+
 if __name__ == "__main__":
     main()

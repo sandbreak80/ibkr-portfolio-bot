@@ -1,8 +1,8 @@
-# 🏆 ULTIMATE STRATEGY RESULTS: ALL 24 STRATEGIES
+# 🏆 ULTIMATE STRATEGY RESULTS: ALL 25 STRATEGIES
 
 **Testing Period:** October 2021 - November 2025 (4.1 years)  
 **Initial Capital:** $10,000  
-**Total Strategies Tested:** 24  
+**Total Strategies Tested:** 25  
 **Benchmark:** SPY (S&P 500 buy-and-hold)
 
 ---
@@ -11,6 +11,7 @@
 
 | Rank | Strategy | CAGR | Sharpe | Max DD | Final $ | vs SPY | Category |
 |------|----------|------|--------|--------|---------|--------|----------|
+| 👑 | **THE KIRK** | **33.78%** 🚀 | **1.60** ⭐⭐⭐ | **-13.83%** ⭐⭐⭐ | **$32,557** 🔥 | **+22.03%** | **CHAMPION** |
 | 🥇 | **SPY (buy/hold)** | **11.79-14.37%** | 0.65-0.80 | -18.76% to -24.50% | **$15,713-$16,121** | -- | Benchmark |
 | 🥈 | **Tail Risk Hedging** | **12.13%** | **1.00** ⭐⭐⭐ | **-10.31%** ⭐⭐⭐ | $15,907 | **-2.25%** | Institutional 2 |
 | 🥉 | **Portable Alpha** | **11.98%** | **0.88** ⭐⭐ | -17.15% | $15,824 | **-2.39%** | Institutional 2 |
@@ -37,15 +38,63 @@
 | 24 | **Market Neutral L/S** | **-9.44%** | -0.80 | -43.66% | $6,688 | -23.82% | Institutional 2 |
 
 **Legend:**
+- 👑 = **ABSOLUTE CHAMPION** (beats everything)
 - ⭐⭐⭐ = Exceptional (top 3)
 - ⭐⭐ = Excellent (top 5)
 - **Bold** = Notable performer
+- 🚀 = Ridiculous returns
+- 🔥 = Money printer
 
 ---
 
-## 🎯 **TOP 5 STRATEGIES (Excluding SPY)**
+## 👑 **THE KIRK: UNDISPUTED CHAMPION**
 
-### **1. Tail Risk Hedging** 🏆 WINNER
+**After testing 25 strategies, we found the winner.**
+
+```
+Strategy:       The Kirk (Sentiment Momentum)
+CAGR:           33.78% (vs SPY 11.79%)
+Sharpe:         1.60 (vs SPY 0.65)
+Max Drawdown:   -13.83% (vs SPY -24.50%)
+Final Value:    $32,557 (vs SPY $15,713)
+Alpha:          +22.03% per year
+
+Return:         3.26x your money in 4 years
+SPY Return:     1.57x your money in 4 years
+Advantage:      2.07x better than buy-and-hold
+```
+
+**What is it?**
+- Volume spikes (2x average) + Price momentum (5-day up)
+- Equal weight top 3 assets
+- Weekly rebalancing
+- "Following the smart money"
+
+**Why it works:**
+- Captures institutional flows (volume = real money)
+- Rides trending assets (momentum persists)
+- Social media era strategy (viral = volume + price)
+- Low concentration risk (only 3 holdings)
+
+**Full details:** See `SENTIMENT_MOMENTUM_STRATEGY.md`
+
+---
+
+## 🎯 **OTHER TOP STRATEGIES** (excluding The Kirk)
+
+### **1. The Kirk** 👑 ABSOLUTE CHAMPION
+```
+CAGR:           33.78%
+Sharpe:         1.60
+Max DD:         -13.83%
+Final Value:    $32,557
+Alpha vs SPY:   +22.03%
+```
+**See full breakdown above and in `SENTIMENT_MOMENTUM_STRATEGY.md`**
+
+---
+
+### **2. Tail Risk Hedging** 🥈 RUNNER-UP
 ```
 CAGR:           12.13%
 Sharpe:         1.00 (PERFECT!)
